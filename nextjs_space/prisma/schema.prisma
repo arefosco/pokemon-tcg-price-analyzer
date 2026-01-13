@@ -1,0 +1,120 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/pokemon_tcg_nextjs/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Set {
+  id          String   @id
+  name        String
+  series      String?
+  releaseDate String?
+  createdAt   DateTime @default(now())
+  cards       Card[]
+}
+
+model Card {
+  id             String          @id
+  name           String
+  setId          String
+  number         String?
+  rarity         String?
+  imageSmall     String?
+  imageLarge     String?
+  psaGrade       Int?
+  createdAt      DateTime        @default(now())
+  set            Set             @relation(fields: [setId], references: [id])
+  priceSnapshots PriceSnapshot[]
+  alerts         Alert[]
+  watchlist      Watchlist[]
+}
+
+model PriceSnapshot {
+  id          Int      @id @default(autoincrement())
+  cardId      String
+  source      String
+  currency    String
+  priceLow    Float?
+  priceMarket Float?
+  priceTrend  Float?
+  psaGrade    Int?
+  timestamp   DateTime @default(now())
+  card        Card     @relation(fields: [cardId], references: [id])
+
+  @@index([cardId])
+}
+
+model Settings {
+  id                    Int      @id @default(1)
+  baseCurrency          String   @default("USD")
+  fxRateEurUsd          Float    @default(1.08)
+  minRoiThreshold       Float    @default(10)
+  tcgplayerFee          Float    @default(0.1)
+  cardmarketFee         Float    @default(0.05)
+  marketplaceFee        Float    @default(0.12)  // Taxa do Mercado Livre/marketplace BR
+  shippingCost          Float    @default(5)
+  importAlertThreshold  Float    @default(3)     // Alerta quando dólar cair X% da média
+  seedProgress          String?
+  lastSeedIndex         Int      @default(0)
+  updatedAt             DateTime @updatedAt
+}
+
+model Alert {
+  id           Int       @id @default(autoincrement())
+  cardId       String
+  cardName     String
+  email        String
+  roiThreshold Float
+  triggered    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  triggeredAt  DateTime?
+  card         Card      @relation(fields: [cardId], references: [id])
+
+  @@index([cardId])
+  @@index([triggered])
+}
+
+model Watchlist {
+  id        Int      @id @default(autoincrement())
+  cardId    String
+  notes     String?
+  createdAt DateTime @default(now())
+  card      Card     @relation(fields: [cardId], references: [id])
+
+  @@unique([cardId])
+  @@index([cardId])
+}
+
+model OpportunityCache {
+  id               Int      @id @default(autoincrement())
+  cardId           String
+  cardName         String
+  setName          String
+  rarity           String?
+  imageSmall       String?
+  psaGrade         Int?
+  buyPrice         Float
+  buySource        String
+  buyCurrency      String
+  sellPrice        Float
+  sellSource       String
+  sellCurrency     String
+  spread           Float
+  netProfit        Float
+  roi              Float
+  fxRate           Float
+  momentum         Float    @default(0)
+  opportunityScore Float    @default(0)
+  liquidity        Float    @default(0)
+  calculatedAt     DateTime @default(now())
+
+  @@unique([cardId])
+  @@index([roi])
+  @@index([opportunityScore])
+  @@index([calculatedAt])
+}
