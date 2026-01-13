@@ -40,9 +40,9 @@ O **Pokémon TCG Price Analyzer** é uma ferramenta completa para colecionadores
 A aplicação compara preços entre **TCGplayer** (EUA), **Cardmarket** (Europa) e calcula o lucro potencial considerando:
 
 - ✅ Taxas de marketplace (TCGplayer 10%, Cardmarket 5%)
-- ✅ Taxa de revenda no Brasil (Mercado Livre 12%)
+- ✅ Taxa de revenda no Brasil (~12%)
 - ✅ Frete internacional
-- ✅ Cotação PTAX em tempo real (Banco Central)
+- ✅ Cotação PTAX em tempo real
 - ✅ Preços de cartas gradadas PSA
 
 ---
